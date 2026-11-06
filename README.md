@@ -1,4 +1,5 @@
 # LambertW
+Forked from the main repo due to correctness bugs, awaiting pull request response.
 ### Lambert W function and associated omega constant
 
 [![Build Status](https://github.com/JuliaMath/LambertW.jl/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/JuliaMath/LambertW.jl/actions/workflows/CI.yml?query=branch%3Amaster)

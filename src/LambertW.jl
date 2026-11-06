@@ -147,7 +147,7 @@ function _lambertw(z::Complex{T}, k::Integer, maxits::Integer) where T<:Real
             w = log(z)
             w += complex(0, k * 2 * pi)
         end
-    elseif k == 0 && imag(z) <= pointseven && abs(z) <= pointseven
+    elseif k == 0 && !isreal(z) && abs(z) <= pointseven
         w = abs(z+ 1//2) < 1//10 ? imag(z) > 0 ? complex(pointseven, pointseven) : complex(pointseven, -pointseven) : z
     else
         if real(z) == convert(T, Inf)

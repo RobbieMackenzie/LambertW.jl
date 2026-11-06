@@ -41,7 +41,7 @@
     end
 
     for (z, k) in ((complex(1, 1), 2), (complex(1, 1), 0), (complex(.6, .6), 0),
-                   (complex(.6, -.6), 0))
+                   (complex(.6, -.6), 0), (complex(-.6, 0.0), 0))
         let w
             @test (w = lambertw(z, k) ; true)
             @test abs(w*exp(w) - z) < 1e-15
