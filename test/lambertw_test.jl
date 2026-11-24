@@ -190,6 +190,21 @@ end
     end
 end
 
+@testset "Float32 and Float16 complex input" begin
+    # The 2πk offsets were Float64, which promoted the initial value and caused a
+    # MethodError in root finding for k != 0, and a Float64 result at infinite z.
+    for T in (Float32, Float16), k in (-2, -1, 1, 2),
+        z in (1e-2 * cis(1.5), 0.2 * cis(-2.0), 2 + 1im, 5 * cis(-2.5))  # |z| <= 1/e and > 1/e
+        zt = Complex{T}(z)
+        w = lambertw(zt, k)
+        @test w isa Complex{T}
+        @test w + log(w) ≈ log(zt) + 2π * k * im
+    end
+    for T in (Float32, Float16), z in (complex(T(Inf), zero(T)), complex(-T(Inf), zero(T)))
+        @test lambertw(z, 1) isa Complex{T}
+    end
+end
+
 @testset "finv" begin
     lambertw_inv = LambertW.finv(lambertw)
     z = 42.0
@@ -212,4 +227,11 @@ end
         @test res[2]
         @test length(res) == 3
     end
+
+    # Infinite z skips root finding. The return for real(z) == Inf and k != 0 was a bare
+    # value rather than a 3-tuple, which also made _lambertw's return type a Union.
+    for z in (complex(Inf, 0.0), complex(-Inf, 0.0)), k in (0, 1)
+        @test lambertw(z, k; info=true) == (lambertw(z, k), true, 0)
+    end
+    @test @inferred(LambertW._lambertw(complex(Inf, 0.0), 1, 1000)) == (complex(Inf, 2pi), true, 0)
 end

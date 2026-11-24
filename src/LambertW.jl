@@ -147,7 +147,7 @@ function _lambertw(z::Complex{T}, k::Integer, maxits::Integer) where T<:Real
             # Two-term asymptotic expansion W_k(z) ≈ L1 - log(L1), with L1 = log(z) + 2πik.
             # Starting from L1 alone, Halley's iteration can converge to a neighbouring branch.
             w = log(z)
-            w += complex(0, k * 2 * pi)
+            w += complex(0, k * 2 * convert(T, pi))
             w -= log(w)
         end
     elseif k == 0 && !isreal(z) && abs(z) <= pointseven
@@ -155,11 +155,11 @@ function _lambertw(z::Complex{T}, k::Integer, maxits::Integer) where T<:Real
     else
         if real(z) == convert(T, Inf)
             k == 0 && return _no_loop(z)
-            return z + complex(0, 2*k*pi)
+            return _no_loop(z + complex(0, 2*k*convert(T, pi)))
         end
-        real(z) == -convert(T, Inf) && return _no_loop(-z + complex(0, (2*k+1)*pi))
+        real(z) == -convert(T, Inf) && return _no_loop(-z + complex(0, (2*k+1)*convert(T, pi)))
         w = log(z)
-        k != 0 ? w += complex(0, 2*k*pi) : nothing
+        k != 0 ? w += complex(0, 2*k*convert(T, pi)) : nothing
     end
     return lambertw_root_finding(z, w, maxits)
 end
