@@ -134,10 +134,13 @@ end
 function _lambertw(z::Complex{T}, k::Integer, maxits::Integer) where T<:Real
     one_t = one(T)
     pointseven = 7//10 * one_t
+    two_k = convert(T, 2*k)
+    pi_t = convert(T, pi)
+    inf_t = convert(T, Inf)
     if abs(z) <= one_t/convert(T, MathConstants.e)
         if z == 0
             k == 0 && return _no_loop(z)
-            return _no_loop(complex(-convert(T, Inf), zero(T)))
+            return _no_loop(complex(-inf_t, zero(T)))
         end
         if k == 0
             w = z
@@ -147,19 +150,19 @@ function _lambertw(z::Complex{T}, k::Integer, maxits::Integer) where T<:Real
             # Two-term asymptotic expansion W_k(z) ≈ L1 - log(L1), with L1 = log(z) + 2πik.
             # Starting from L1 alone, Halley's iteration can converge to a neighbouring branch.
             w = log(z)
-            w += complex(0, k * 2 * convert(T, pi))
+            w += complex(0, two_k*pi_t)
             w -= log(w)
         end
     elseif k == 0 && !isreal(z) && abs(z) <= pointseven
         w = abs(z+ 1//2) < 1//10 ? imag(z) > 0 ? complex(pointseven, pointseven) : complex(pointseven, -pointseven) : z
     else
-        if real(z) == convert(T, Inf)
+        if real(z) == inf_t
             k == 0 && return _no_loop(z)
-            return _no_loop(z + complex(0, 2*k*convert(T, pi)))
+            return _no_loop(z + complex(0, two_k*pi_t))
         end
-        real(z) == -convert(T, Inf) && return _no_loop(-z + complex(0, (2*k+1)*convert(T, pi)))
+        real(z) == -inf_t && return _no_loop(-z + complex(0, (two_k + 1)*pi_t))
         w = log(z)
-        k != 0 ? w += complex(0, 2*k*convert(T, pi)) : nothing
+        k != 0 ? w += complex(0, two_k*pi_t) : nothing
     end
     return lambertw_root_finding(z, w, maxits)
 end

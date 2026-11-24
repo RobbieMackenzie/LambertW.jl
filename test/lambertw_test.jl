@@ -29,6 +29,12 @@
     ## BigInt for second arg does not promote the type
     @test typeof(lambertw(-0.2, -1)) == typeof(lambertw(-0.2, BigInt(-1)))
 
+    ## Same for complex z. A BigInt k used to promote the 2πk offsets to BigFloat,
+    ## which caused a MethodError in root finding.
+    for z in (complex(0.01, 0.01), complex(2.0, 1.0), complex(Inf, 0.0), complex(-Inf, 0.0))
+        @test lambertw(z, BigInt(1)) === lambertw(z, 1)
+    end
+
     for (z, k, res) in [ (0, 0 , 0), (complex(0, 0), 0 , 0),
                          (complex(0.0, 0), 0 , 0), (complex(1.0, 0), 0, 0.567143290409783873) ]
         if Int != Int32
