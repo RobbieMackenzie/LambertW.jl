@@ -144,8 +144,11 @@ function _lambertw(z::Complex{T}, k::Integer, maxits::Integer) where T<:Real
         elseif k == -1 && imag(z) == 0 && real(z) < 0
             w = complex(log(-real(z)), 1//10^7) # need offset for z ≈ -1/e.
         else
+            # Two-term asymptotic expansion W_k(z) ≈ L1 - log(L1), with L1 = log(z) + 2πik.
+            # Starting from L1 alone, Halley's iteration can converge to a neighbouring branch.
             w = log(z)
             w += complex(0, k * 2 * pi)
+            w -= log(w)
         end
     elseif k == 0 && !isreal(z) && abs(z) <= pointseven
         w = abs(z+ 1//2) < 1//10 ? imag(z) > 0 ? complex(pointseven, pointseven) : complex(pointseven, -pointseven) : z

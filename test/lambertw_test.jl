@@ -177,6 +177,19 @@ end
     @test isapprox(lambertw(z, -1), -2.6181060466381134 - 4.1495292474932475im)
 end
 
+@testset "branch selection for small |z|" begin
+    # Starting Halley's iteration from log(z) + 2πik could converge to a neighbouring
+    # branch, e.g. lambertw(1e-4im, -1) returned W_1(1e-4im).
+    # Reference: fixed point of w = log(z) - 2πi - log(w), computed in BigFloat.
+    @test lambertw(1e-4im, -1) ≈ -11.678805002184129 - 1.7167479566496993im
+    @test lambertw(-1e-4im, 1) ≈ -11.678805002184129 + 1.7167479566496993im
+    # For z off the negative real axis, w == W_k(z) iff w + log(w) == log(z) + 2πik
+    for z in (1e-5 * cis(2.5), 1e-100 * cis(-1.0), 1e-300 * cis(0.5)), k in (-3, -2, -1, 1, 2, 3)
+        w = lambertw(z, k)
+        @test w + log(w) ≈ log(z) + 2π * k * im
+    end
+end
+
 @testset "finv" begin
     lambertw_inv = LambertW.finv(lambertw)
     z = 42.0
